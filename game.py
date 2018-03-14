@@ -121,78 +121,114 @@ class Board:
 
 		return best, bestMove
 
+	def printBoard(self):
+		newBoard = []
+		for square in range(9):
+			if self.getSquare(square) == X or self.getSquare(square) == O:
+				newBoard += board.getSquareValue(square)
+			else:
+				newBoard += " "
 
+		print(newBoard[0], " | ", newBoard[1], " | ", newBoard[2])
+		print("-------------")
+		print(newBoard[3], " | ", newBoard[4], " | ", newBoard[5])
+		print("-------------")
+		print(newBoard[6], " | ", newBoard[7], " | ", newBoard[8])
 
+	def printRawBoard(self):
+		print(self.getSquare(0), " | ", self.getSquare(1), " | ", self.getSquare(2))
+		print("-------------")
+		print(self.getSquare(3), " | ", self.getSquare(4), " | ", self.getSquare(5))
+		print("-------------")
+		print(self.getSquare(6), " | ", self.getSquare(7), " | ", self.getSquare(8))
 
+	def printNumbersBoard(self):
+		print(0, " | ", 1, " | ", 2)
+		print("-------------")
+		print(3, " | ", 4, " | ", 5)
+		print("-------------")
+		print(6, " | ", 7, " | ", 8)
 
-#Human vs Human play functions
-def printBoard(board):
-	newBoard = []
-	for square in range(9):
-		if board.getSquare(square) == X or board.getSquare(square) == O:
-			newBoard += board.getSquareValue(square)
+	def playXHuman(self):
+		printBoard(board)
+		square = int(input("Player one (X), select which square you would like to play in: "))
+		if board.isSquareEmpty(square):
+			board.placePiece(square, X)
 		else:
-			newBoard += " "
+			board.didOWin = True
 
-	print(newBoard[0], " | ", newBoard[1], " | ", newBoard[2])
-	print("-------------")
-	print(newBoard[3], " | ", newBoard[4], " | ", newBoard[5])
-	print("-------------")
-	print(newBoard[6], " | ", newBoard[7], " | ", newBoard[8])
+	def playOHuman(self):
+		printBoard(board)
+		square = int(input("Player two (O), select which square you would like to play in: "))
+		if board.isSquareEmpty(square):
+			board.placePiece(square, O)
+		else:
+			board.didXWin = True
 
-def printRawBoard(board):
-	print(board.getSquare(0), " | ", board.getSquare(1), " | ", board.getSquare(2))
-	print("-------------")
-	print(board.getSquare(3), " | ", board.getSquare(4), " | ", board.getSquare(5))
-	print("-------------")
-	print(board.getSquare(6), " | ", board.getSquare(7), " | ", board.getSquare(8))
+	def playXAI(self):
 
-def printNumbersBoard():
-	print(0, " | ", 1, " | ", 2)
-	print("-------------")
-	print(3, " | ", 4, " | ", 5)
-	print("-------------")
-	print(6, " | ", 7, " | ", 8)
+	def playOAI(self):
 
-def playX(board):
-	printBoard(board)
-	square = int(input("Player one (X), select which square you would like to play in: "))
-	if board.isSquareEmpty(square):
-		board.placePiece(square, X)
-	else:
-		board.didOWin = True
 
-def playO(board):
-	printBoard(board)
-	square = int(input("Player two (O), select which square you would like to play in: "))
-	if board.isSquareEmpty(square):
-		board.placePiece(square, O)
-	else:
-		board.didXWin = True
 
-def runTwoPlayers():
-	board = Board()
-	printNumbersBoard()
 
-	while True:
-		if not board.isGameOver():
-			playX(board)
-			board.updateGameStatus()
-		if not board.isGameOver():
-			playO(board)
-			board.updateGameStatus()
+class Game:
+	
+	def __init__(self):
+		board = Board()
+
+	def playHuman():
+		printNumbersBoard()
+
+		while True:
+			if not board.isGameOver():
+				playX(board)
+				board.updateGameStatus()
+			if not board.isGameOver():
+				playO(board)
+				board.updateGameStatus()
+			if board.isGameOver():
+				break
+
+		if board.didXWin:
+			print("Player 1 wins!")
+		elif board.didOWin:
+			print("Player 2 wins!")
+		elif board.isTie:
+			print("It's a tie!")
+
 		if board.isGameOver():
-			break
+			print("Game over")
 
-	if board.didXWin:
-		print("Player 1 wins!")
-	elif board.didOWin:
-		print("Player 2 wins!")
-	elif board.isTie:
-		print("It's a tie!")
+	def playXAI():
+		printNumbersBoard()
 
-	if board.isGameOver():
-		print("Game over")
+		while True:
+			if not board.isGameOver():
+				playX(board)
+				board.updateGameStatus()
+			if not board.isGameOver():
+				playO(board)
+				board.updateGameStatus()
+			if board.isGameOver():
+				break
+
+		if board.didXWin:
+			print("Player 1 wins!")
+		elif board.didOWin:
+			print("Player 2 wins!")
+		elif board.isTie:
+			print("It's a tie!")
+
+		if board.isGameOver():
+			print("Game over")
+
+	def playYAI():
+
+
+
+
+
 
 
 
