@@ -1,20 +1,20 @@
 #from player import *
-from play import *
+
 #from neuralnet import *
 
 """COMPLETE"""
 
 import numpy as np
 
-X = 1
-O = -1
+X = 0
+O = 1
 
 class Board:
 
 	def __init__(self):
-		self.value = np.array([[0, 0, 0],
-							   [0, 0, 0],
-							   [0, 0, 0]])
+		self.value = np.array([[-1, -1, -1],
+							   [-1, -1, -1],
+							   [-1, -1, -1]])
 		self.didXWin = False
 		self.didOWin = False
 		self.isTie = False
@@ -81,6 +81,47 @@ class Board:
 
 	def placePiece(self, square, piece):
 		self.value[int(square)//3][int(square)%3] = piece
+
+	def removePiece(self, square):
+		self.value[int(square)//3][int(square)%3] = -1
+
+	def possibleMoves(self):
+		result = []
+		for i in range(9):
+			if self.isSquareEmpty(i):
+				result.append(i)
+		return result
+
+	def minimax(self, player, depth=0):
+		if player == O:
+			best = -10
+		else:
+			best = 10
+
+		if self.isGameOver():
+			if self.didXWin:
+				return -10 + depth, None
+			elif self.didOWin:
+				return 10 - depth, None
+			elif self.isTie:
+				return 0, None
+
+		bestMove= -1
+
+		for move in self.possibleMoves():
+			self.placePiece(move, player)
+			val, temp = self.minimax(1-player, depth+1)
+			self.removePiece(move)
+			if player == O:
+				if val > best:
+					best, bestMove = val, move
+			elif player == X:
+				if val < best:
+					best, bestMove = val, move
+
+		return best, bestMove
+
+
 
 
 
