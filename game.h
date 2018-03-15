@@ -24,22 +24,18 @@ class Board {
 		void printSquareNumbers() const;
 		int getStatus() const;
 		void updateStatus();
-		int getBestMove(int player);
-		void changeTurn();
 
 
 
 	private:
 		char squareToPiece(int square) const;
 		bool isBoardFull() const;
-		int* minimax(int depth, bool isMax);
 
-		int _turn;
 		int _board[BOARD_SIZE];
 		int _status;		//0 = X win, 1 = O win, 2 = tie, -1 = in progress
 };
 
-
+std::vector<int> minimax(Board board, int depth, int player);
 
 
 
@@ -53,10 +49,9 @@ class Game {
 	
 	private:
 		void playHuman();
-		//void playAIX();
-		//void playAIO();
+		void playAI(int player);
 		void takeTurnHuman(int player);
-		//void takeTurnAI();
+		void takeTurnAI(int player);
 		void printEndGame();
 
 		int gameMode;

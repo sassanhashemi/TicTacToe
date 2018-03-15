@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cassert>
 #include "game.h"
+#include <vector>
 
 
 
@@ -16,7 +17,6 @@ Board::Board() {
 		_board[i] = EMPTY;
 	}
 	_status = IN_PROGRESS;
-	_turn = X;
 }
 int Board::getSquare(int square) const {
 	assert(square >= 0 && square < BOARD_SIZE);
@@ -24,7 +24,6 @@ int Board::getSquare(int square) const {
 }
 void Board::setSquare(int square, int player) {
 	assert(square >= 0 && square < BOARD_SIZE);
-	assert(player == X || player == O || player == EMPTY);
 	_board[square] = player;
 }
 bool Board::isEmpty(int square) const {
@@ -98,78 +97,65 @@ bool Board::isBoardFull() const {
 	}
 	return true;
 }
-int* Board::minimax(int depth, bool isMax) {
-	assert(isMax == _turn);
-	// X is the minimizing player, O is the maximizing player
-	// Base case
-	if (_status == X) {
-		int* arr = new int[2];
-		arr[0] = -1;
-		arr[1] = -10+depth;
-		return arr;
-	} else if (_status == O) {
-		int* arr = new int[2];
-		arr[0] = -1;
-		arr[1] = 10-depth;
-		return arr;
-	} else if (_status == DRAW) {
-		int* arr = new int[2];
-		arr[0] = -1;
-		arr[1] = 0;
-		return arr;
+
+
+
+// MINIMAX FUNCTION
+std::vector<int> minimax(Board board, int depth, int player) {
+	if (board.getStatus() == X) {
+		std::vector<int> result;
+		result.push_back(-1);
+		result.push_back(-10+depth);
+		return result;
+	} else if (board.getStatus() == O) {
+		std::vector<int> result;
+		result.push_back(-1);
+		result.push_back(10-depth);
+		return result;
+	} else if (board.getStatus() == DRAW) {
+		std::vector<int> result;
+		result.push_back(-1);
+		result.push_back(0);
+		return result;
 	}
 
-	// Recursive case
-
-	// X's turn
-	if (_turn == X) {
-		int* bestMove = new int[2];
-		bestMove[0] = -1;
-		bestMove[1] = 20;
+	if (player == X) {
+		std::vector<int> result;
+		result.push_back(-1);
+		result.push_back(20);
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			if (getSquare(i) == EMPTY) {
-				setSquare(i, X);
-				changeTurn();
-				int* move = minimax(depth+1, O);
-				if (move[1] > bestMove[1]) {
-					bestMove[0] = i; //TODO: check this for error. I might have to make new move
-					bestMove[1] = move[1];
+			if (board.isEmpty(i)) {
+				board.setSquare(i, X);
+				board.updateStatus();
+				int score = minimax(board, depth+1, O)[1];
+				if (score < result[1]) {
+					result[1] = score;
+					result[0] = i;
 				}
-				setSquare(i, EMPTY);
-				changeTurn();
+				board.setSquare(i, EMPTY);
+				board.updateStatus();
 			}
 		}
-		return bestMove;
-	}
-	
-	// O's turn
-	if (_turn == O) {
-		int* bestMove = new int[2];
-		bestMove[0] = -1;
-		bestMove[1] = -20;
+		return result;
+	} else {
+		std::vector<int> result;
+		result.push_back(-1);
+		result.push_back(-20);
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			if (getSquare(i) == EMPTY) {
-				setSquare(i, O);
-				changeTurn();
-				int* move = minimax(depth+1, X);
-				if (move[1] > bestMove[1]) {
-					bestMove[0] = i;				//TODO: check this for error. I might have to make new move
-					bestMove[1] = move[1];
+			if (board.isEmpty(i)) {
+				board.setSquare(i, O);
+				board.updateStatus();
+				int score = minimax(board, depth+1, X)[1];
+				if (score > result[1]) {
+					result[1] = score;
+					result[0] = i;
 				}
-				setSquare(i, EMPTY);
-				changeTurn();
+				board.setSquare(i, EMPTY);
+				board.updateStatus();
 			}
 		}
-		return bestMove;
+		return result;
 	}
-	return NULL;
-}
-int Board::getBestMove(int player) {
-	assert(player == _turn);
-	return minimax(0, player)[0];
-}
-void Board::changeTurn() {
-	_turn = 1 - _turn;
 }
 
 
@@ -205,10 +191,10 @@ void Game::play() {
 			playHuman();
 			break;
 		case X:
-			//playAIX();
+			playAI(X);
 			break;
 		case O:
-			//playAIO();
+			playAI(O);
 			break;
 		default:
 			std::cerr << "Invalid gameMode" << std::endl;
@@ -225,14 +211,37 @@ void Game::playHuman() {
 	_board.printSquareNumbers();
 
 	while (_board.getStatus() == EMPTY) {
-		std::cout << "The best move is: " << _board.getBestMove(X) << std::endl;
 		takeTurnHuman(X);
 		if (_board.getStatus() == EMPTY) {
-			std::cout << "The best move is: " << _board.getBestMove(X) << std::endl;
 			takeTurnHuman(O);
 		}
 	}
 
+	printEndGame();
+}
+void Game::playAI(int player) {
+	std::cout << "Welcome to TicTacToe. The board is shown below with each " <<
+	"square represented by the number it contains. To play a move, type in " <<
+	"the number of the square you wish to play in, and press enter." << 
+	std::endl;
+
+	_board.printSquareNumbers();
+	if (player == X) {
+		while (_board.getStatus() == EMPTY) {
+			takeTurnHuman(X);
+			if (_board.getStatus() == EMPTY) {
+				takeTurnAI(O);
+			}
+		}
+	} else if (player == O) {
+		while (_board.getStatus() == EMPTY) {
+			takeTurnAI(X);
+			if (_board.getStatus() == EMPTY) {
+				takeTurnHuman(O);
+			}
+		}
+	}
+	
 	printEndGame();
 }
 void Game::takeTurnHuman(int player) {
@@ -248,7 +257,13 @@ void Game::takeTurnHuman(int player) {
 
 	_board.setSquare(square, player);
 	_board.updateStatus();
-	_board.changeTurn();
+	_board.printBoard();
+}
+void Game::takeTurnAI(int player) {
+	int move = minimax(_board, player, 0)[0];
+	_board.setSquare(move, player);
+	_board.updateStatus();
+	std::cout << "The AI played in the square " << move << std::endl;
 	_board.printBoard();
 }
 void Game::printEndGame() {
