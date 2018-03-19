@@ -76,8 +76,7 @@ void Board::updateStatus() {
 	}
 }
 int Board::getBestMove(int player) {
-	Board newBoard(*this);
-	return minimax(newBoard, 0, player)[0];
+	return minimax(*this, 0, player)[0];
 }
 char Board::squareToPiece(int square) const {
 	switch (_board[square]) {
