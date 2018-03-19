@@ -1,4 +1,4 @@
-
+#include <vector>
 
 #ifndef GAME_H
 #define GAME_H
@@ -24,18 +24,21 @@ class Board {
 		void printSquareNumbers() const;
 		int getStatus() const;
 		void updateStatus();
-
+		int getBestMove(int player);
 
 
 	private:
 		char squareToPiece(int square) const;
 		bool isBoardFull() const;
 
+		
+
 		int _board[BOARD_SIZE];
 		int _status;		//0 = X win, 1 = O win, 2 = tie, -1 = in progress
 };
 
-std::vector<int> minimax(Board board, int depth, int player);
+std::vector<int> minimax(Board& board, int depth, int player);
+std::vector<int> minimax2(Board board, int depth, int player);
 
 
 
@@ -54,7 +57,7 @@ class Game {
 		void takeTurnAI(int player);
 		void printEndGame();
 
-		int gameMode;
+		int _gameMode;
 		Board _board;
 };
 
