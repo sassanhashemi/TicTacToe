@@ -1,3 +1,7 @@
+// File: game.cpp
+// Name: Sassan Hashemi
+// Date: March 19, 2018
+
 
 #ifndef GAME_CPP
 #define GAME_CPP

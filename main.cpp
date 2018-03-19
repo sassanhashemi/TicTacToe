@@ -1,3 +1,7 @@
+// File: main.cpp
+// Name: Sassan Hashemi
+// Date: March 19, 2018
+
 #include <iostream>
 #include "game.h"
 

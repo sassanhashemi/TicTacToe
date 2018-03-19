@@ -1,3 +1,8 @@
+// File: game.h
+// Name: Sassan Hashemi
+// Date: March 19, 2018
+
+
 #include <vector>
 
 #ifndef GAME_H
