@@ -259,7 +259,7 @@ void Game::takeTurnHuman(int player) {
 	int square;
 	std::cout << "Please enter the number of the square you wish to play in: ";
 	std::cin >> square;
-	while (!_board.isEmpty(square-1)) {
+	while (square<1  || square>9 || !_board.isEmpty(square-1)) {
 		std::cout << "Invalid choice, please try again" << std::endl;
 		std::cout << "Please enter the number of the square you wish to play in: ";
 		std::cin >> square;
