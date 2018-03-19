@@ -7,4 +7,4 @@ game: game.cpp game.o main.cpp
 #	g++ game.o tests.cpp -o tests
 
 clean:
-	rm game tests *.o
+	rm game tests game.h.gch *.o

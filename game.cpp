@@ -38,11 +38,11 @@ void Board::printBoard() const {
 	std::cout << squareToPiece(6) << " | " << squareToPiece(7) << " | " << squareToPiece(8) << std::endl;
 }
 void Board::printSquareNumbers() const {
-	std::cout << 0 << " | " << 1 << " | " << 2 << std::endl;
+	std::cout << 1 << " | " << 2 << " | " << 3 << std::endl;
 	std::cout << "---------" << std::endl;
-	std::cout << 3 << " | " << 4 << " | " << 5 << std::endl;
+	std::cout << 4 << " | " << 5 << " | " << 6 << std::endl;
 	std::cout << "---------" << std::endl;
-	std::cout << 6 << " | " << 7 << " | " << 8 << std::endl;
+	std::cout << 7 << " | " << 8 << " | " << 9 << std::endl;
 }
 int Board::getStatus() const {
 	return _status;
@@ -256,13 +256,13 @@ void Game::takeTurnHuman(int player) {
 	int square;
 	std::cout << "Please enter the number of the square you wish to play in: ";
 	std::cin >> square;
-	while (!_board.isEmpty(square)) {
+	while (!_board.isEmpty(square-1)) {
 		std::cout << "Invalid choice, please try again" << std::endl;
 		std::cout << "Please enter the number of the square you wish to play in: ";
 		std::cin >> square;
 	}
 
-	_board.setSquare(square, player);
+	_board.setSquare(square-1, player);
 	_board.updateStatus();
 	_board.printBoard();
 }
@@ -270,7 +270,7 @@ void Game::takeTurnAI(int player) {
 	int move = _board.getBestMove(player);
 	_board.setSquare(move, player);
 	_board.updateStatus();
-	std::cout << "The AI played in the square " << move << std::endl;
+	std::cout << "The AI played in the square " << move+1 << std::endl;
 	_board.printBoard();
 }
 void Game::printEndGame() {
