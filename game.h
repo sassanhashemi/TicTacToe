@@ -43,7 +43,7 @@ class Board {
 };
 
 std::vector<int> minimax(Board& board, int depth, int player);
-std::vector<int> minimax2(Board board, int depth, int player);
+std::vector<int> alphaBetaMinimax(Board board, int depth, int player, int alpha, int beta);
 
 
 

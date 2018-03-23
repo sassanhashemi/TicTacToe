@@ -80,7 +80,8 @@ void Board::updateStatus() {
 	}
 }
 int Board::getBestMove(int player) {
-	return minimax(*this, 0, player)[0];
+	//return minimax(*this, 0, player)[0];
+	return alphaBetaMinimax(*this, 0, player, -100, 100)[0];
 }
 char Board::squareToPiece(int square) const {
 	switch (_board[square]) {
@@ -109,65 +110,85 @@ bool Board::isBoardFull() const {
 
 
 
-// MINIMAX ALGORITHM
+// MINIMAX ALGORITHMS
 std::vector<int> minimax(Board& board, int depth, int player) {
-	if (board.getStatus() == DRAW) {
+	if (board.getStatus() == X || board.getStatus() == O || board.getStatus() == DRAW) {
 		std::vector<int> result;
 		result.push_back(-1);
-		result.push_back(0);
-		return result;
-	} else if (board.getStatus() == X) {
-		std::vector<int> result;
-		result.push_back(-1);
-		result.push_back(-10+depth);
-		return result;
-	} else if (board.getStatus() == O) {
-		std::vector<int> result;
-		result.push_back(-1);
-		result.push_back(10-depth);
+		if (board.getStatus() == DRAW) {
+			result.push_back(0);
+		} else {
+			result.push_back(board.getStatus()? 10-depth : -10+depth);
+		}
 		return result;
 	}
-
-	if (player == X) {
-		std::vector<int> bestMove;
-		bestMove.push_back(-1);
-		bestMove.push_back(20);
-		for (int i=0; i<BOARD_SIZE; i++) {
-			if (board.isEmpty(i)) {
-				board.setSquare(i, X);
-				board.updateStatus();
-				int score = minimax(board, depth+1, O)[1];
-				if (score <= bestMove[1]) {
-					bestMove[1] = score;
-					bestMove[0] = i;
-				}
-				board.setSquare(i, EMPTY);
-				board.updateStatus();
+	std::vector<int> bestMove;
+	bestMove.push_back(-1);
+	bestMove.push_back(20-40*player);
+	for (int i=0; i<BOARD_SIZE; i++) {
+		if (board.isEmpty(i)) {
+			board.setSquare(i, player);
+			board.updateStatus();
+			int score = minimax(board, depth+1, 1-player)[1];
+			if (score < bestMove[1] && !player) {
+				bestMove[1] = score;
+				bestMove[0] = i;
+			} else if (score > bestMove[1] && player) {
+				bestMove[1] = score;
+				bestMove[0] = i;
 			}
+			board.setSquare(i, EMPTY);
+			board.updateStatus();
 		}
-		return bestMove;
-	} else if (player == O) {
-		std::vector<int> bestMove;
-		bestMove.push_back(-1);
-		bestMove.push_back(-20);
-		for (int i=0; i<BOARD_SIZE; i++) {
-			if (board.isEmpty(i)) {
-				board.setSquare(i, O);
-				board.updateStatus();
-				int score = minimax(board, depth+1, X)[1];
-				if (score >= bestMove[1]) {
-					bestMove[1] = score;
-					bestMove[0] = i;
-				}
-				board.setSquare(i, EMPTY);
-				board.updateStatus();
-			}
-		}
-		return bestMove;
 	}
-	std::cerr << "Shouldn't get to the end of the minimax function" << std::endl;
-	exit(1);
+	return bestMove;
 }
+std::vector<int> alphaBetaMinimax(Board board, int depth, int player, int alpha, int beta) {
+	if (board.getStatus() != IN_PROGRESS) {
+		std::vector<int> result;
+		result.push_back(-1);
+		if (board.getStatus() == DRAW) {
+			result.push_back(0);
+		} else {
+			result.push_back(board.getStatus()? 10-depth : -10+depth);
+		}
+		return result;
+	}
+	std::vector<int> bestMove;
+	bestMove.push_back(-1);
+	bestMove.push_back(20-40*player);
+	for (int i=0; i<BOARD_SIZE; i++) {
+		if (board.isEmpty(i)) {
+			board.setSquare(i, player);
+			board.updateStatus();
+			int score = alphaBetaMinimax(board, depth+1, 1-player, alpha, beta)[1];
+			if (player == X) {			// Minimizing
+				if (score < bestMove[1]) {
+					bestMove[0] = i;
+					bestMove[1] = score;
+				}
+				beta = (score < beta)? score : beta;
+				if (beta <= alpha) {
+					break;
+				}
+			} else if (player == O) {	// Maximizing
+				if (score > bestMove[1]) {
+					bestMove[0] = i;
+					bestMove[1] = score;
+				}
+				alpha = (score > alpha)? score : alpha;
+				if (beta <= alpha) {
+					break;
+				}
+
+			}
+			board.setSquare(i, EMPTY);
+			board.updateStatus();
+		}
+	}
+	return bestMove;
+}
+
 
 
 // GAME MEMBER FUNCTIONS
